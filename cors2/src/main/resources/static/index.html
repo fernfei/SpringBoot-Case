@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery-3.4.1.min.js"></script>
+</head>
+<body>
+<div id="div">
+
+</div>
+<input type="button" onclick="getfunction()" value="get">
+<input type="button" onclick="putfunction()" value="put">
+<script>
+    function getfunction(){
+        $.get("http://localhost:8081/gethello",function (data) {
+            $("#div").html(data)
+        })
+    }
+    function putfunction() {
+        $.ajax({
+            type:'put',
+            url:"http://localhost:8081/puthello",
+            success:function (data) {
+                $("#div").html(data)
+            }
+        })
+
+    }
+</script>
+</body>
+</html>

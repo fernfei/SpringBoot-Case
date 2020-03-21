@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--
+            自动扫描service，dao,controller下有@service ,@controller
+           use-default-filters用来指示是否自动扫描带有@Component、@Repository、@Service和@Controller的类。默认为true
+     -->
+    <context:component-scan base-package="com.hufei.xmlssm" use-default-filters="true">
+        <!--意思是：不包括Controller层-->
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+
+</beans>

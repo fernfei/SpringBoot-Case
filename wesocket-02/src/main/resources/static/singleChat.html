@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>群聊室</title>
+    <script src="/webjars/jquery/3.4.1/dist/jquery.min.js"></script>
+    <script src="/webjars/sockjs-client/1.1.2/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<table>
+    <tr>
+        <td><input type="button" id="connection" value="连接"/> </td>
+        <td><input type="button" id="disconnection" disabled="disabled" value="断开" /> </td>
+    </tr>
+</table>
+
+<div id="chat" style="display: none">
+   <table>
+
+       <tr>
+           <td>请输入聊天内容：</td>
+           <td><input type="text" id="content"></td>
+           <td>请输入要发送到的用户名：</td>
+           <td><input type="text" id="to"></td>
+           <td><input type="button" id="send" value="发送"></td>
+       </tr>
+   </table>
+    <div id="conversation" style="border: 1px #ffd86c solid;width: 300px;text-align: center">信息框</div>
+</div>
+
+<script>
+    $(function () {
+        var stompClient = null;
+        //连接
+        $("#connection").click(function () {
+            connection(true)
+        });
+        //断开
+        $("#disconnection").click(function () {
+            connection(false)
+        })
+        //发送
+        $("#send").click(function () {
+            send($("#content").val())
+        })
+    });
+
+    //连接
+    function connection(flag) {
+        if(!flag&&stompClient!=null){
+            bottomStatus(flag)
+            showHidenChat(flag)
+            //断开
+            stompClient.disconnect();
+            return
+        }
+        bottomStatus(flag)
+        showHidenChat(flag)
+        //服务器连接点
+        var socket=new SockJS("/singleChat")
+        //返回客户端对象
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({},function (successCallback) {
+
+            //订阅服务器上的消息
+            stompClient.subscribe("/user/queue/greetings", function (msg) {
+                //服务端返回的对象放在msg.body
+                showGreeting(JSON.parse(msg.body))
+            });
+        });
+    }
+    //发信息
+    function send(msg) {
+        stompClient.send("/app/hello",{},JSON.stringify({"to":$("#to").val(),"content":$("#content").val()}))
+    }
+    //展示信息的框
+    function showGreeting(msg) {
+        $("#conversation").append("<div>"+msg.from+":"+msg.content+"</div>");
+    }
+
+    //连接断开的按钮状态
+    function bottomStatus(flag) {
+        $("#connection").prop("disabled", flag);
+        $("#disconnection").prop("disabled", !flag);
+    }
+    //发送消息输入框的状态
+    function showHidenChat(flag) {
+        if (flag) {
+            $("#chat").show();
+        }else{
+            $("#chat").hide();
+        }
+    }
+</script>
+</body>
+</html>
